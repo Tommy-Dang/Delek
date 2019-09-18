@@ -1,6 +1,6 @@
 # HW1
 
-This is the link to my Readme file: https://tommy-dang.github.io/HW1/
+This is the link to my presentation: https://tommy-dang.github.io/HW1/
 
 This is the link to my github repo: https://github.com/Tommy-Dang/HW1
 
