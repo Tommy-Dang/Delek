@@ -451,20 +451,20 @@ function create_slider_array(num, {options,title, value:_default}, _class){
         .append('g')
         .attr('transform', 'translate(30,15)')
         .call(sliderSimple);
-    gSimple.style('height',0)
-    sliderLabel.append('button')
-        .text('Edit')
-        .datum({value:false})
-        .on('click',function(d){
-            d.value = !d.value;
-            if (d.value){
-                d3.select(this).text('Hide');
-                gSimple.style('height','50px')
-            }else{
-                d3.select(this).text('Edit');
-                gSimple.style('height',0)
-            }
-        });
+    // gSimple.style('height',0)
+    // sliderLabel.append('button')
+    //     .text('Edit')
+    //     .datum({value:false})
+    //     .on('click',function(d){
+    //         d.value = !d.value;
+    //         if (d.value){
+    //             d3.select(this).text('Hide');
+    //             gSimple.style('height','50px')
+    //         }else{
+    //             d3.select(this).text('Edit');
+    //             gSimple.style('height',0)
+    //         }
+    //     });
 }
 
 
