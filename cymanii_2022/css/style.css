@@ -64,6 +64,13 @@ div.tooltip {
     opacity:0
 }
 
+._slider p.temperatures {
+    margin-bottom: 0;
+}
+
+._slider button {
+    margin-left: 10px;
+}
 /*.slider1{*/
 /*    display: flex;*/
 /*    width: auto;*/

@@ -34,7 +34,6 @@ let perc_toggle = false;
 
 async function load_data(){
     d3.csv("./data/sankey_data.csv", function(error, data) {
-        debugger
         adjust_fuel(calculate_values())
         recalc();
         data_ = update_data(data)
@@ -43,24 +42,29 @@ async function load_data(){
     })
 }
 
-let controlDict = ()=>0;
-
+let controlDict = {};
+let controlgroup = ['002','003','003A','004','004A'];
+controlgroup.forEach(d=>{
+    optimum['baffle_spacing'+'_'+d] = 2;
+    optimum['tube_pattern'+'_'+d] = '90-Square';
+    controlDict[d] = ()=>0;
+});
 function load_control(){
-    return new Promise((resolve)=>resolve(d3.csv("./data/heat-exchanger_data/06E-002.csv", function(error, data) {
-        debugger
+    return new Promise((resolve)=>resolve(controlgroup.map(d=>d3.csv(`./data/heat-exchanger_data/06E-${d}.csv`, function(error, data) {
+
         const baffle_spacing_values = d3.nest().key(d=>d['baffle_spacing']).entries(data);
         const baffle_spacing_options = baffle_spacing_values.sort((a,b)=>a.key.localeCompare(b.key));
-        optimum['baffle_spacing'] = baffle_spacing_options[0].key;
-        create_slider_array('baffle_spacing', {options:baffle_spacing_options.map(d=>d.key),value:optimum['baffle_spacing']}, 'temperatures');
+        optimum['baffle_spacing'+'_'+d] = baffle_spacing_options[0].key;
+        create_slider_array('baffle_spacing'+'_'+d, {title:`[${d}] baffle_spacing`,options:baffle_spacing_options.map(d=>d.key),value:optimum['baffle_spacing'+'_'+d]}, 'temperatures');
 
         const tube_pattern_values = d3.nest().key(d=>d['tube_pattern']).entries(data);
         const tube_pattern_options = tube_pattern_values.sort((a,b)=>a.key.localeCompare(b.key));
-        optimum['tube_pattern'] = tube_pattern_options[0].key;
-        create_slider_array('tube_pattern',{options:tube_pattern_options.map(d=>d.key),value:optimum['tube_pattern']}, 'temperatures');
+        optimum['tube_pattern'+'_'+d] = tube_pattern_options[0].key;
+        create_slider_array('tube_pattern'+'_'+d,{title:`[${d}] tube_pattern`,options:tube_pattern_options.map(d=>d.key),value:optimum['tube_pattern'+'_'+d]}, 'temperatures');
 
         const dict = d3.nest().key(d=>d['baffle_spacing']).key(d=>d['tube_pattern']).object(data);
-        debugger
-        controlDict = ({baffle_spacing,tube_pattern})=>{
+
+        controlDict[d] = ({baffle_spacing,tube_pattern})=>{
             if (dict[baffle_spacing]&&dict[baffle_spacing][tube_pattern]){
                 let values = dict[baffle_spacing][tube_pattern][0];
                 return {delta_temperature:+values['delta_temperature'],result:((+values['delta_temperature'])-21.309604301425622) /0.0316688}
@@ -68,7 +72,7 @@ function load_control(){
             return {delta_temperature:undefined,result:undefined};
         };
         return (data)
-    })))
+    }))))
 }
 
 load_control().then(load_data)
@@ -307,9 +311,10 @@ function delta_display(){
         .attr('id', 'deltaTemp')
 
     let html = MathJax.tex2chtml(`\\Delta T_m = 0.0316688 \\times fuel\\_gas + 21.309604301425622`);
+    let html2 = MathJax.tex2chtml(`Total\\_fuel\\_gas = ${controlgroup.map(d=>`fuel_{${d}}`).join('+')}`);
     let text = html.outerHTML;
     // //d3.select('#deltaTemp').text(html);
-    document.getElementById("formula").innerHTML = text;
+    document.getElementById("formula").innerHTML = text+html2.outerHTML;
 
 }
 let values = {}
@@ -377,7 +382,7 @@ function create_slider(num, _min, _max, _default, _class){
     gSimple.call(sliderSimple);
 }
 
-function create_slider_array(num, {options, value:_default}, _class){
+function create_slider_array(num, {options,title, value:_default}, _class){
 
     // check before ass new slider
     if (!d3.select('#sliders').select('#slider'+num).empty()){
@@ -392,7 +397,7 @@ function create_slider_array(num, {options, value:_default}, _class){
         .attr('class', '_slider')
 
 
-    let sliderValue = d3.select('#slider'+num)
+    let sliderLabel = d3.select('#slider'+num)
         .append('p')
         .attr('id', "heading"+num)
         .attr('class', _class)
@@ -401,20 +406,21 @@ function create_slider_array(num, {options, value:_default}, _class){
             if (num === 'Percentage'){
                 return 'Heat Exchanger '+num+' Increase : '
             }
-            else{ return num+ ': ' }
-        })
+            else{ return (title??num)+ ' = ' }
+        });
         //.text(num+': ')
-        .append('span')
+    sliderLabel.append('span')
         .attr("id","value"+num)
         .text(function(){
             return _default
         });
 
+
     let optionsReverse = {};
     options.forEach((d,i)=>{
         optionsReverse[d] = i;
     });
-    debugger
+
     let sliderSimple = d3v6
         .sliderBottom()
         .min(0)
@@ -425,7 +431,6 @@ function create_slider_array(num, {options, value:_default}, _class){
         .ticks(5)
         .default(optionsReverse[_default])
         .on('onchange', val => {
-            debugger
             //filter_intersection(val)
             d3.select('#value'+num).text(options[val]);
 
@@ -440,22 +445,41 @@ function create_slider_array(num, {options, value:_default}, _class){
         .attr("id", "slider"+num+'svg')
         .attr('class', _class)
         .attr('width', 400)
-        .attr('height', 75)
-        .append('g')
-        .attr('transform', 'translate(30,30)');
+        .attr('height', 50);
 
-    gSimple.call(sliderSimple);
+    gSimple
+        .append('g')
+        .attr('transform', 'translate(30,15)')
+        .call(sliderSimple);
+    gSimple.style('height',0)
+    sliderLabel.append('button')
+        .text('Edit')
+        .datum({value:false})
+        .on('click',function(d){
+            d.value = !d.value;
+            if (d.value){
+                d3.select(this).text('Hide');
+                gSimple.style('height','50px')
+            }else{
+                d3.select(this).text('Edit');
+                gSimple.style('height',0)
+            }
+        });
 }
 
 
 function calculate_values(){
-    const baffle_spacing = d3.select('#valuebaffle_spacing').text();
-    const tube_pattern = d3.select('#valuetube_pattern').text();
 
-    let {delta_temperature,result} = controlDict({baffle_spacing,tube_pattern})
-    let result_ = d3v6.format('.3')(result)
+    let result = controlgroup.map(d=>{
+        const baffle_spacing = d3.select('#valuebaffle_spacing_'+d).text();
+        const tube_pattern = d3.select('#valuetube_pattern_'+d).text();
+        let {delta_temperature,result} = controlDict[d]({baffle_spacing,tube_pattern})
+        return result;
+    });
+    let total = d3.sum(result)
+    let result_ = d3v6.format('s')(total)
 
-    let formula_string = `${delta_temperature} = 0.0316688 \\times ${result_} + 21.309604301425622`
+    let formula_string = `${result_} =${result.map(d=>d3v6.format('s')(d)).join('+')}`
     update_formula(formula_string)
 
     MathJax.typeset(() => {
@@ -464,7 +488,7 @@ function calculate_values(){
         return math;
     });
 
-    return result
+    return total
 }
 let dict_perc = {}
 let total_dict = {}
@@ -480,9 +504,11 @@ function update_formula(string){
 
 }
 
-create_slider_array('baffle_spacing', {options:[2,3,4,5,6],value:optimum['baffle_spacing']}, 'temperatures')
-create_slider_array('tube_pattern',{options:['90-Square','30-Triangular','60-Rotated Tri.','45-Rotated Sqr.'],value:optimum['tube_pattern']}, 'temperatures')
 
+controlgroup.forEach(d=>{
+    create_slider_array('baffle_spacing'+'_'+d, {title:`[${d}] baffle_spacing`,options:[2,3,4,5,6],value:optimum['baffle_spacing'+'_'+d]}, 'temperatures')
+    create_slider_array('tube_pattern'+'_'+d,{title:`[${d}] tube_pattern`,options:['90-Square','30-Triangular','60-Rotated Tri.','45-Rotated Sqr.'],value:optimum['tube_pattern'+'_'+d]}, 'temperatures')
+});
 
 
 delta_display()
@@ -537,7 +563,7 @@ function update_data(data){
     return data
 }
 function adjust_fuel(result){
-    total_dict['Fuel'] = result*920.67/1000000 //(result/972.8)
+    total_dict['Fuel'] = result*920.67/1000000  //(result/972.8)
 }
 function adjust(result){
     adjust_fuel(result);
