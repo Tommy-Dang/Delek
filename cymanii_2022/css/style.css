@@ -50,6 +50,18 @@
 }
 
 
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    min-width: 200px;
+    height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: white;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
 
 /*.slider1{*/
 /*    display: flex;*/

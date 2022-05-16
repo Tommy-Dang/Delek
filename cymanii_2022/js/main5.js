@@ -148,22 +148,42 @@ function draw_sankey(data){
             .enter().append("path")
             .attr("class", "link")
             .attr("d", path)
-            .attr("title", (d)=>`${d.source.Name}->${d.target.name}<br> ${Math.round(d.value*10)/10} ${units}`)
+            // .attr("title", (d)=>`${d.source.Name}->${d.target.name}<br> ${Math.round(d.value*10)/10} ${units}`)
             .style("stroke-width", function(d) { return Math.max(1, d.dy); })
             .style("stroke", function (d){ return linkColors(d.type)} )
             //.style("stroke", function (d){ return '#000'} )
             .style("fill", "none")
             .style("stroke-opacity", .2)
-            .on("mouseover",function() {d3.select(this).style("stroke-opacity", .5)})
-            .on("mouseleave",function() {d3.select(this).style("stroke-opacity", .2)})
+            .on("mouseover",function(d) {
+                d3.select(this).style("stroke-opacity", .5);
+                d3.select('div.tooltip').transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                d3.select('div.tooltip').html(`${d.source.name} → ${d.target.name}<br> ${Math.round(d.value*10)/10} ${units}`)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+
+            })
+            .on("mousemove",function(d) {
+                d3.select('div.tooltip')
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+
+            })
+            .on("mouseleave",function() {
+                d3.select(this).style("stroke-opacity", .2);
+                d3.select('div.tooltip').transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            })
 
             .sort(function(a, b) { return b.dy - a.dy; });
 
         // add the link titles
-        link.append("title")
-            .text(function(d) {
-                return d.source.name + " → " +
-                    d.target.name + "\n" + format(d.value); });
+        // link.append("title")
+        //     .text(function(d) {
+        //         return d.source.name + " → " +
+        //             d.target.name + "\n" + format(d.value); });
 
         // add in the nodes
         var node = svg.append("g").selectAll(".node")
@@ -517,7 +537,7 @@ function update_data(data){
     return data
 }
 function adjust_fuel(result){
-    total_dict['Fuel'] = (result/972.8)
+    total_dict['Fuel'] = result*920.67/1000000 //(result/972.8)
 }
 function adjust(result){
     adjust_fuel(result);
