@@ -537,7 +537,7 @@ function update_data(data){
     return data
 }
 function adjust_fuel(result){
-    total_dict['Fuel'] = result*24*920.67/1000000 //(result/972.8)
+    total_dict['Fuel'] = result*920.67/1000000 //(result/972.8)
 }
 function adjust(result){
     adjust_fuel(result);
