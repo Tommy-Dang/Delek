@@ -148,6 +148,7 @@ function draw_sankey(data){
             .enter().append("path")
             .attr("class", "link")
             .attr("d", path)
+            .attr("title", (d)=>`${d.source.Name}->${d.target.name}<br> ${Math.round(d.value*10)/10} ${units}`)
             .style("stroke-width", function(d) { return Math.max(1, d.dy); })
             .style("stroke", function (d){ return linkColors(d.type)} )
             //.style("stroke", function (d){ return '#000'} )
@@ -516,7 +517,7 @@ function update_data(data){
     return data
 }
 function adjust_fuel(result){
-    total_dict['Fuel'] = .774 / (result / 45.8)
+    total_dict['Fuel'] = result/1405.5568947058375
 }
 function adjust(result){
     adjust_fuel(result);
