@@ -1,0 +1,21 @@
+baffle_spacing,tube_pattern,delta_temperature
+7,90-Square,104.6
+6,90-Square,106.8
+5,90-Square,110.4
+4,90-Square,110.8
+3,90-Square,111.9
+7,30-Triangular,106.2
+6,30-Triangular,111.1
+5,30-Triangular,111.7
+4,30-Triangular,112.2
+3,30-Triangular,113.3
+7,60-Rotated Tri.,103.9
+6,60-Rotated Tri.,105.9
+5,60-Rotated Tri.,107.0
+4,60-Rotated Tri.,108.5
+3,60-Rotated Tri.,109.8
+7,45-Rotated Sqr.,106.4
+6,45-Rotated Sqr.,108.9
+5,45-Rotated Sqr.,110.1
+4,45-Rotated Sqr.,110.7
+3,45-Rotated Sqr.,112.1

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sankey Diagram</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+<button id='percentage_button' onclick="toggle_percentage()">Percentage</button>
+
+
+
+<div id="sankey">
+    <h3>Energy Productivity</h3>
+</div>
+
+<div id="optimization" >
+    <div id="optimization_result">
+<!--        <p>\[\Delta T_m = {  (T_1-t_2)-(T_2-t_1) \over \ln{T_1-t_2 \over T_2-t_1}}\]</p>-->
+    </div>
+
+    <div id="sliders"></div>
+</div>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://unpkg.com/d3-simple-slider"></script>
+<script>d3v6 = d3;window.d3 = null;</script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="js/sankey.js"></script>
+<script src="js/main5.js"></script>
+
+</body>
+</html>
+<!https://bl.ocks.org/d3noob/06e72deea99e7b4859841f305f63ba85>

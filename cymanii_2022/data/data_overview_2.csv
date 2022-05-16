@@ -1,0 +1,16 @@
+source,target,value,type
+Onsite Steam Generation,Thermal-Chemical,1,steam
+Onsite Steam Generation,Non-FCC process,1,steam
+Thermal-Chemical,Applied Energy,1,none
+Thermal-Chemical,Steam,1,steam
+Thermal-Chemical,Loss Energy,1,loss
+Onsite Steam Generation,Process Heating,1,steam
+Process Heating,Thermal-Chemical,2,thermal
+Process Heating,Loss Energy,1,loss
+Fuel,Process Heating,1,fuel
+Electricity,Process Heating,1,electricity
+Electricity,Machine Drive,1,electricity
+Electricity,Non-process energy,1,electricity
+Machine Drive,Loss Energy,1,loss
+Non-FCC process,Loss Energy,1,loss
+Non-process energy,Loss Energy,1,loss

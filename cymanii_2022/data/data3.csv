@@ -1,0 +1,10 @@
+﻿source,target,value
+Fuel,Process Energy,8113
+Fuel,Onsite Production,10614
+Steam,Process Energy,488
+Electricity,Process Energy,5612
+Coke,Onsite Production,6161
+Process Energy,Coke,6161
+Onsite Production,Steam ,6161
+Onsite Production,Consumed,14213
+Process Energy,Consumed,16775

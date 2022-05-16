@@ -1,0 +1,16 @@
+source,target,value
+Feed Oil,Heat Integration,5
+Natural Gas,Heat Integration,3
+Recovered Energy,Heat Integration,1
+Electricity,Product Transport,2
+Onsite Production ,Product Transport,.25
+Onsite Production ,Heat Integration,.75
+Heat Integration,Process,9.75
+Product Transport,Process,2.25
+Process,Products,9
+Process,Coke,3
+Products,Applied,8
+Products,Energy Recovery,1
+Coke,Steam,1
+Coke,Applied,2
+Steam,Onsite Production,1

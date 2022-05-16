@@ -1,0 +1,12 @@
+source,target,value
+Feed Oil,Process,1
+Natural Gas,Process,1
+Electricity,Process,1
+Onsite Production ,Process,1
+Process,Products,2
+Process,Coke,1
+Process,Steam,1
+Products,Applied,1
+Products,Energy Recovery,1
+Coke,Onsite Production,1
+Steam,Onsite Production,1

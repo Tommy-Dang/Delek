@@ -1,0 +1,11 @@
+﻿source,target,value
+Purchased,Natural Gas,8113
+Purchased,Steam,488
+Purchased,Electricity,5612
+Produced,Fuel,10614
+Produced,Coke,6161
+Natural Gas,Consumed,8113
+Steam,Consumed,488
+Electricity,Consumed,5612
+Fuel,Consumed,10614
+Coke,Consumed,6161

@@ -1,0 +1,17 @@
+source,target,value,type
+Onsite Steam Generation,Thermal-Chemical,0.10104767301329604,steam
+Onsite Steam Generation,Non-FCC process,0.02526191825332401,steam
+Fuel,Process Heating,0.17211299988839251,fuel
+Thermal-Chemical,Applied Energy,0.25648349015948846,none
+Thermal-Chemical,Steam,0.12213499531404212,steam
+Thermal-Chemical,Loss Energy,0.0284981655732765,loss
+Process Heating,Thermal-Chemical,0.3060689780335111,thermal
+Process Heating,Loss Energy,0.07651724450837777,loss
+Electricity,Process Heating,0.21047322265349624,electricity
+Electricity,Machine Drive,0.28063096353799505,electricity
+Electricity,Non-process energy,0.10523661132674812,electricity
+Machine Drive,Loss Energy,0.07015774088449876,loss
+Non-FCC process,Loss Energy,0.13049852958007213,loss
+Non-process energy,Loss Energy,0.10523661132674812,loss
+Electricity,Non-FCC process,0.10523661132674812,electricity
+Machine Drive,Applied Energy,0.21047322265349627,electricity

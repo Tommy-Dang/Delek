@@ -1,0 +1,19 @@
+source,target,value,type
+Produced Fuel Gas,Charge Heater,1,fuel
+Natural Gas,Charge Heater,1,fuel
+Produced Steam,Air Blower,1,steam
+Recovered Thermal,Heat Exchanger,1.5,thermal
+Heat Exchanger,Reactor,1,thermal
+Electricity,Pumps,1,electricity
+Natural Gas,Regenerator,1,fuel
+Charge Heater,Reactor,2,thermal
+Air Blower,Regenerator,1,thermal
+Pumps,Reactor,1,electricity
+Reactor,Main Fractionator,2.5,thermal
+Reactor,Process Consumption,1.5,thermal
+Regenerator,CO Boiler,2,thermal
+CO Boiler,Produced Steam ,1,steam
+CO Boiler,Unrecovered Thermal,1,loss
+Main Fractionator, Recovered Thermal,1.5,thermal
+Main Fractionator,Produced Fuel Gas ,1,fuel
+Heat Exchanger,Unrecovered Thermal,.5,loss

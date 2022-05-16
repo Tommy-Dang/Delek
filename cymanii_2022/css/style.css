@@ -1,0 +1,69 @@
+.node rect {
+    cursor: move;
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+}
+
+.node text {
+    pointer-events: none;
+    text-shadow: 0 1px 0 #fff;
+}
+
+#sankey{
+    position: absolute;
+    top: 0vh;
+    left:35vw;
+}
+
+#optimization{
+    position: absolute;
+    top: 5vh;
+    left:-2.5vw;
+}
+
+._slider{
+    position: relative;
+    /*width: auto;*/
+    /*height: auto;*/
+    left: 5vw;
+}
+._result{
+    position: relative;
+    /*width: auto;*/
+    /*height: auto;*/
+    left: 4vw;
+}
+
+#percentage_button{
+    position: relative;
+    /*width: auto;*/
+    /*height: auto;*/
+    top: 1vh;
+    left: 1vw;
+}
+.percentage{
+    position: relative;
+    /*width: auto;*/
+    /*height: auto;*/
+    top: 3vh;
+    left: 0vw;
+}
+
+
+
+/*.slider1{*/
+/*    display: flex;*/
+/*    width: auto;*/
+/*    height: auto;*/
+/*    top: 75vh;*/
+/*}*/
+
+/*.link {*/
+/*    fill: none;*/
+/*    stroke: #000;*/
+/*    stroke-opacity: .2;*/
+/*}*/
+
+/*.link:hover {*/
+/*    stroke-opacity: .5;*/
+/*}*/
