@@ -10,7 +10,6 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
     format = function(d) { return formatNumber(d) + " " + units; },
     color = d3.scaleOrdinal(d3.schemeCategory10);
 
-let optimum = {baffle_spacing:6,tube_pattern:'90-Square'}
 
 
 let linkColors = d3.scaleOrdinal()
@@ -32,6 +31,9 @@ let data_
 
 let perc_toggle = false;
 
+let parallelCoordinate = d3.parallelCoordinate();
+parallelCoordinate.init('#paralell');
+
 async function load_data(){
     d3.csv("./data/sankey_data.csv", function(error, data) {
         adjust_fuel(calculate_values())
@@ -42,37 +44,88 @@ async function load_data(){
     })
 }
 
-let controlDict = {};
-let controlgroup = ['002']//['002','003','003A','004','004A'];
-controlgroup.forEach(d=>{
-    optimum['baffle_spacing'+'_'+d] = 2;
-    optimum['tube_pattern'+'_'+d] = '90-Square';
-    controlDict[d] = ()=>0;
-});
+let controlgroup = ['002','003','003A','004','004A'];
+
+let controlgroupName = 'Preset'
+let dimensions = [
+    {text:controlgroupName, range:[0,controlgroup.length-1], tickFormat: ((d)=>controlgroup[d]),type:'string'},
+    {text:'baffle_spacing', tickFormat: d=>d},
+    {text:'tube_pattern', tickFormat: d=>d,type:'string'},
+    {text:'delta_temperature', tickFormat: d3.format('.2s')},
+    {text:'fuel_gas', title: 'Fuel gas (SCFH)', tickFormat: d3.format('.2s'), color:linkColors('fuel')},
+];
+function convertDeltatTemp(delta){
+    return (delta-21.309604301425622) /0.0316688
+}
 function load_control(){
-    return new Promise((resolve)=>resolve(controlgroup.map(d=>d3.csv(`./data/heat-exchanger_data/06E-${d}.csv`, function(error, data) {
+    return Promise.all(controlgroup.map(controlName=>new Promise((resolve)=>d3.csv(`./data/heat-exchanger_data/06E-${controlName}.csv`, function(error, data) {
 
-        const baffle_spacing_values = d3.nest().key(d=>d['baffle_spacing']).entries(data);
-        const baffle_spacing_options = baffle_spacing_values.sort((a,b)=>a.key.localeCompare(b.key));
-        optimum['baffle_spacing'+'_'+d] = baffle_spacing_options[0].key;
-        create_slider_array('baffle_spacing'+'_'+d, {title:`[${d}] baffle_spacing`,options:baffle_spacing_options.map(d=>d.key),value:optimum['baffle_spacing'+'_'+d]}, 'temperatures');
+        // const baffle_spacing_values = d3.nest().key(d=>d['baffle_spacing']).entries(data);
+        // const baffle_spacing_options = baffle_spacing_values.sort((a,b)=>a.key.localeCompare(b.key));
+        //
+        // const tube_pattern_values = d3.nest().key(d=>d['tube_pattern']).entries(data);
+        // const tube_pattern_options = tube_pattern_values.sort((a,b)=>a.key.localeCompare(b.key));
+        data.forEach(d=>{
+            d['baffle_spacing'] = (+d['baffle_spacing']);
+            d['delta_temperature'] = (+d['delta_temperature']);
+            d[controlgroupName] = controlName;
+            d['fuel_gas'] = convertDeltatTemp(d['delta_temperature'])
+        });
 
-        const tube_pattern_values = d3.nest().key(d=>d['tube_pattern']).entries(data);
-        const tube_pattern_options = tube_pattern_values.sort((a,b)=>a.key.localeCompare(b.key));
-        optimum['tube_pattern'+'_'+d] = tube_pattern_options[0].key;
-        create_slider_array('tube_pattern'+'_'+d,{title:`[${d}] tube_pattern`,options:tube_pattern_options.map(d=>d.key),value:optimum['tube_pattern'+'_'+d]}, 'temperatures');
+        resolve (data)
+    })))).then((_data)=>{
 
-        const dict = d3.nest().key(d=>d['baffle_spacing']).key(d=>d['tube_pattern']).object(data);
+        const data = [];
+        const convertDim = dimensions.filter(d=>d.type=='string');
+        const convertDimOb = {};
+        convertDim.forEach(s=>convertDimOb[s.text]={root:s,value:{}});
+        _data.forEach(d=>d.forEach(d=>{
+            data.push(d);
+            convertDim.forEach(s=>convertDimOb[s.text].value[d[s.text]]=1);
+        }));
+        debugger
+        // custom input and function to convert to realdata
+        Object.keys(convertDimOb).forEach(dim=>{
+            const keys = convertDimOb[dim].value;
+            convertDimOb[dim].root.values = Object.keys(keys).sort((a,b)=>a.localeCompare(b));
+            convertDimOb[dim].root.values.forEach((k,i)=>{
+                    keys[k] = i;
+                });
+            convertDimOb[dim].root.str2num = keys;
+            convertDimOb[dim].root.tickFormat = (d)=>convertDimOb[dim].root.values[d]
 
-        controlDict[d] = ({baffle_spacing,tube_pattern})=>{
-            if (dict[baffle_spacing]&&dict[baffle_spacing][tube_pattern]){
-                let values = dict[baffle_spacing][tube_pattern][0];
-                return {delta_temperature:+values['delta_temperature'],result:((+values['delta_temperature'])-21.309604301425622) /0.0316688}
+        })
+        const dataDraw = [];
+        data.forEach((d,i)=>{
+            const item = {id:i,...d};
+            convertDim.forEach((d)=>{
+                item[d.text] = d.str2num[item[d.text]];
+            });
+            dataDraw.push(item)
+        });
+        Object.entries(data[0]).forEach(([key,value])=>values[key] = value)
+
+        // init parallel collumn
+        const customAxis ={};
+        dimensions.forEach((s, si) => {
+            customAxis[s.text]=s
+        });
+        parallelCoordinate.onBrush = ()=>{
+            const index = parallelCoordinate.selectedID()[0];
+            if (data[index]){
+                Object.entries(data[index]).forEach(([key,value])=>values[key] = value);
+                adjust(calculate_values());
+                parallelCoordinate.colorMap = {[index]:linkColors('fuel')};
+                parallelCoordinate.reRender()
             }
-            return {delta_temperature:undefined,result:undefined};
         };
-        return (data)
-    }))))
+        parallelCoordinate.colorMap = {0:linkColors('fuel')};
+        parallelCoordinate.customAxis(customAxis)
+            .dimensionKey(dimensions.map(d=>d.text))
+            .graphicopt({width: 500,height:350})
+            .data(dataDraw)
+            .draw()
+    })
 }
 
 load_control().then(load_data)
@@ -299,6 +352,11 @@ function draw_sankey(data){
 }
 
 
+function draw_parallelCoordinate(data) {
+    parallelCoordinate.draw();
+}
+
+
 function delta_display(){
     let delta = d3.select('div#optimization_result')
         .append('p')
@@ -309,20 +367,22 @@ function delta_display(){
         //.text('Delta Temperature Result: ')
         .append("span")
         .attr('id', 'deltaTemp')
+    try{
+        MathJax.tex2chtml(`{ \\color{purple} fuel\\_gas } = \\frac{\\Delta T_m - 21.309604301425622}{0.0316688} `)
+    }catch(e){
 
+    }
     let html = MathJax.tex2chtml(`fuel\\_gas = \\frac{\\Delta T_m - 21.309604301425622}{0.0316688} `);
-    // let html2 = MathJax.tex2chtml(`Total\\_fuel\\_gas = ${controlgroup.map(d=>`fuel_{${d}}`).join('+')}`);
-    let html2 = MathJax.tex2chtml(`\\Sigma\\Delta T_m = ${controlgroup.map(d=>`\\Delta T_{m ${d}}`).join('+')}`);
+    debugger
     let text = html.outerHTML;
     // //d3.select('#deltaTemp').text(html);
-    document.getElementById("formula").innerHTML = html2.outerHTML+text;
+    document.getElementById("formula").innerHTML = text;
 
 }
 let values = {}
-values["baffle_spacing"] = optimum['baffle_spacing'].toString()
-values["tube_pattern"] = optimum['tube_pattern'].toString()
+values["fuel_gas"] = 0;
 
-values['Percentage'] = 0
+values['Percentage'] = 0;
 function create_slider(num, _min, _max, _default, _class){
 
     let sliderContainer = d3
@@ -471,19 +531,10 @@ function create_slider_array(num, {options,title, value:_default}, _class){
 
 function calculate_values(){
 
-    let result = controlgroup.map(d=>{
-        const baffle_spacing = d3.select('#valuebaffle_spacing_'+d).text();
-        const tube_pattern = d3.select('#valuetube_pattern_'+d).text();
-        let {delta_temperature,result} = controlDict[d]({baffle_spacing,tube_pattern})
-        return delta_temperature;
-    });
-    let totaldelta = d3.sum(result);
-    let total = (totaldelta-21.309604301425622) /0.0316688
-    let resultdelta_ = d3v6.format('s')(totaldelta)
+    let total = values.fuel_gas
     let result_ = d3v6.format('s')(total)
 
-    let formula_string = [`${resultdelta_} =${result.map(d=>d3v6.format('s')(d)).join('+')}`,
-    `${result_} = \\frac{${resultdelta_} - 21.309604301425622}{0.0316688}`];
+    let formula_string = `${result_} = \\frac{${values.delta_temperature} - 21.309604301425622}{0.0316688}`;
     update_formula(formula_string)
 
     MathJax.typeset(() => {
@@ -503,7 +554,7 @@ recalc()
 
 function update_formula(string){
     let text = '';
-    if (typeof string ==='String') {
+    if (typeof string ==='string') {
         let html = MathJax.tex2chtml(string);
         text = html.outerHTML;
     }else{
@@ -511,12 +562,6 @@ function update_formula(string){
     }
     document.getElementById("deltaTemp").innerHTML = text;
 }
-
-
-controlgroup.forEach(d=>{
-    create_slider_array('baffle_spacing'+'_'+d, {title:`[${d}] baffle_spacing`,options:[2,3,4,5,6],value:optimum['baffle_spacing'+'_'+d]}, 'temperatures')
-    create_slider_array('tube_pattern'+'_'+d,{title:`[${d}] tube_pattern`,options:['90-Square','30-Triangular','60-Rotated Tri.','45-Rotated Sqr.'],value:optimum['tube_pattern'+'_'+d]}, 'temperatures')
-});
 
 
 delta_display()

@@ -9,22 +9,16 @@
     text-shadow: 0 1px 0 #fff;
 }
 
-#vizHolder {
-    display: flex;
-    width: 100vw;
-    justify-content: center;
+#sankey{
+    position: absolute;
+    top: 0vh;
+    left:35vw;
 }
 
-#sankey{
-    position: relative;
-}
-#paralell{
-    margin-right:20px;
-}
 #optimization{
-    position: relative;
-    /*top: 5vh;*/
-    /*left:-2.5vw;*/
+    position: absolute;
+    top: 5vh;
+    left:-2.5vw;
 }
 
 ._slider{
