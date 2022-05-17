@@ -35,7 +35,7 @@ d3.parallelCoordinate = function () {
         animationTime: 1000
     };
     let svg, canvas, dimensions,selectedID;
-
+    let dimPositionScale = d3.scaleLinear()
     master.init = function (container) {
         let div = d3.select(container);
         div.selectAll('*').remove();
@@ -46,6 +46,8 @@ d3.parallelCoordinate = function () {
             .style('position','absolute')
             .style('top',0)
             .style('left',0);
+        svg.append('g').attr('class','mainLayer');
+        svg.append('g').attr('class','extraLayer');
         updateSize();
     };
 
@@ -115,10 +117,11 @@ d3.parallelCoordinate = function () {
         // graphicopt.height = graphicopt.margin.top+graphicopt.margin.bottom + graphicopt.elHeight*dimensions.length;
         updateSize();
         //<axis>
-        const dimPositionScale = d3.scaleLinear().domain([0,dimensions.length-1])
+        dimPositionScale = d3.scaleLinear().domain([0,dimensions.length-1])
             .range([graphicopt.margin.left,graphicopt.width-graphicopt.margin.right]);
 
-        const axisg = svg.selectAll('g.axis').data(dimensions);
+        const holder = svg.select('g.mainLayer');
+        const axisg = holder.selectAll('g.axis').data(dimensions);
         axisg.exit().remove();
         axisg.merge(axisg.enter().append('g').attr('class','axis'))
             .attr('transform',d=>`translate(${dimPositionScale(d.order)},0)`)
@@ -128,8 +131,8 @@ d3.parallelCoordinate = function () {
                     .style('stroke','white')
                     .style('paint-order','stroke')
             });
-        svg.selectAll('g.brush').remove();
-        const brushg = svg.selectAll('g.brush').data(dimensions);
+        holder.selectAll('g.brush').remove();
+        const brushg = holder.selectAll('g.brush').data(dimensions);
         brushg.exit().remove();
         brushg.merge(brushg.enter().append('g').attr('class','brush'))
             .attr('transform',d=>`translate(${dimPositionScale(d.order)},0)`)
@@ -137,7 +140,7 @@ d3.parallelCoordinate = function () {
                 d.el.brush = d3.select(this);
                 d.el.brush.call(d.brush);
             });
-        const labelhg = svg.selectAll('text.label').data(dimensions);
+        const labelhg = holder.selectAll('text.label').data(dimensions);
         labelhg.exit().remove();
         labelhg.merge(labelhg.enter().append('text').attr('class','label'))
             .attr('transform',d=>`translate(${dimPositionScale(d.order)},${graphicopt.margin.top}) rotate(15)`)
@@ -210,6 +213,7 @@ d3.parallelCoordinate = function () {
         filterData()
     };
     master.dimensions = ()=>dimensions
+    master.dimPositionScale = ()=>dimPositionScale
     master.reRender = ()=>{};
     master.customAxis = (input) => updateVar(input, 'customAxis');
     master.minmax = (input) => updateVar(input, 'minmax');

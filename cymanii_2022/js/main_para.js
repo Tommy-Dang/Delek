@@ -123,14 +123,24 @@ function load_control(){
             }
         };
 
+        let linkPS = d3.select('#paralell').select('g.extraLayer');
+        linkPS.append('path').attr('fill',linkColors('fuel'))
         parallelCoordinate.colorMap = {0:linkColors('fuel')};
-        afterUpdateSankey = ()=>{
+        afterUpdateSankey = ({nodes})=>{
+            const path = d3.area()
+                .y0(d=>d[1])
+                .y1(d=>d[2])
+                .x(d=>d[0])
+                .curve(d3v6.curveBumpX)
+            const sankeyNode = nodes.find(d=>d.name==='Fuel');
+            let target = [parallelCoordinate.graphicopt().width, sankeyNode.y+margin.top,sankeyNode.y+sankeyNode.dy+margin.top];
             // get last dimension
             let lastDim = parallelCoordinate.dimensions()[dimensions.length-1];
-            lastDim.scale(values[lastDim.key]);
-            d3.select('#paralell').select('path')
-            debugger
-        }
+            const pointy = lastDim.scale(values[lastDim.key])-1.5;
+            let source = [parallelCoordinate.dimPositionScale()(dimensions.length-1),pointy,pointy+1.5];
+            linkPS.select('path').attr('d',path([source,target]));
+        };
+
         parallelCoordinate.customAxis(customAxis)
             .dimensionKey(dimensions.map(d=>d.text))
             .graphicopt({width: 500,height:350})
@@ -347,7 +357,7 @@ function draw_sankey(data){
             .style("fill", "black")
 
         
-        afterUpdateSankey()
+        afterUpdateSankey(graph)
 
         // the function for moving the nodes
         function dragmove(d) {
