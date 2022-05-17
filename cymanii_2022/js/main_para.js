@@ -123,8 +123,15 @@ function load_control(){
             }
         };
 
+        let color_sankey = d3.color(linkColors('fuel'));
+        color_sankey.opacity=0.3
+        debugger
         let linkPS = d3.select('#paralell').select('g.extraLayer');
-        linkPS.append('path').attr('fill',linkColors('fuel'))
+        linkPS.append('defs').html(`<linearGradient id="GradientFuel">
+        <stop stop-color="${linkColors('fuel')}" offset="0%"/>
+        <stop stop-color="${color_sankey.toString()}" offset="100%"/>
+      </linearGradient>`)
+        linkPS.append('path').attr('fill',"url(#GradientFuel)")
         parallelCoordinate.colorMap = {0:linkColors('fuel')};
         afterUpdateSankey = ({nodes})=>{
             const path = d3.area()
@@ -177,7 +184,7 @@ function draw_sankey(data){
 // Set the sankey diagram properties
     var sankey = d3.sankey()
         // .nodeWidth(46)
-        .nodeWidth(12)
+        .nodeWidth(6)
         .nodePadding(40)
         .size([width, height]);
 
@@ -370,6 +377,7 @@ function draw_sankey(data){
                     ) + ")");
             sankey.relayout();
             link.attr("d", path);
+            afterUpdateSankey(graph)
         }
 }
 
