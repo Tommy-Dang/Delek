@@ -18,8 +18,10 @@
 #sankey{
     position: relative;
 }
+#sankey svg {
+    overflow: visible;
+}
 #paralell{
-    margin-right:20px;
 }
 #optimization{
     position: relative;

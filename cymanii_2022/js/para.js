@@ -8,7 +8,7 @@ d3.parallelCoordinate = function () {
         outlyingCoefficient:1.5,
     };
     const graphicopt = {
-        margin: {top: 45, right: 20, bottom: 20, left: 40},
+        margin: {top: 45, right: 40, bottom: 20, left: 40},
         width: 300,
         height: 300,
         scalezoom: 1,
@@ -209,6 +209,7 @@ d3.parallelCoordinate = function () {
         };
         filterData()
     };
+    master.dimensions = ()=>dimensions
     master.reRender = ()=>{};
     master.customAxis = (input) => updateVar(input, 'customAxis');
     master.minmax = (input) => updateVar(input, 'minmax');

@@ -1,7 +1,7 @@
 var units = "MBTU/D";
 
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 10, bottom: 50, left: 10},
+var margin = {top: 10, right: 10, bottom: 50, left: 0},
     width = 1000 - margin.left - margin.right,
     height = 340 - margin.top - margin.bottom;
 
@@ -57,6 +57,8 @@ let dimensions = [
 function convertDeltatTemp(delta){
     return (delta-21.309604301425622) /0.0316688
 }
+let afterUpdateSankey = ()=>{};
+
 function load_control(){
     return Promise.all(controlgroup.map(controlName=>new Promise((resolve)=>d3.csv(`./data/heat-exchanger_data/06E-${controlName}.csv`, function(error, data) {
 
@@ -110,6 +112,7 @@ function load_control(){
         dimensions.forEach((s, si) => {
             customAxis[s.text]=s
         });
+
         parallelCoordinate.onBrush = ()=>{
             const index = parallelCoordinate.selectedID()[0];
             if (data[index]){
@@ -119,7 +122,15 @@ function load_control(){
                 parallelCoordinate.reRender()
             }
         };
+
         parallelCoordinate.colorMap = {0:linkColors('fuel')};
+        afterUpdateSankey = ()=>{
+            // get last dimension
+            let lastDim = parallelCoordinate.dimensions()[dimensions.length-1];
+            lastDim.scale(values[lastDim.key]);
+            d3.select('#paralell').select('path')
+            debugger
+        }
         parallelCoordinate.customAxis(customAxis)
             .dimensionKey(dimensions.map(d=>d.text))
             .graphicopt({width: 500,height:350})
@@ -335,7 +346,8 @@ function draw_sankey(data){
             .attr("text-anchor", "start")
             .style("fill", "black")
 
-
+        
+        afterUpdateSankey()
 
         // the function for moving the nodes
         function dragmove(d) {
@@ -352,9 +364,6 @@ function draw_sankey(data){
 }
 
 
-function draw_parallelCoordinate(data) {
-    parallelCoordinate.draw();
-}
 
 
 function delta_display(){
@@ -616,7 +625,7 @@ function update_data(data){
     return data
 }
 function adjust_fuel(result){
-    total_dict['Fuel'] = result*920.67/1000000  //(result/972.8)
+    total_dict['Fuel'] = (result*24*920.67/1000000)/1405.5568947058375  //(result/972.8)
 }
 function adjust(result){
     adjust_fuel(result);
